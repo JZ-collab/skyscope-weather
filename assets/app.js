@@ -2,43 +2,23 @@
   'use strict';
 
   const DEFAULT_LOCATION = {
-    name: 'San Francisco',
-    admin1: 'California',
-    country: 'United States',
-    latitude: 37.7749,
-    longitude: -122.4194,
-    timezone: 'America/Los_Angeles'
+    name: 'San Francisco', admin1: 'California', country: 'United States',
+    latitude: 37.7749, longitude: -122.4194, timezone: 'America/Los_Angeles'
   };
+  const STORAGE_KEYS = { unit: 'skyscope-unit', saved: 'skyscope-saved' };
 
   const WMO = {
-    0: { label: 'Clear sky', icon: 'sun' },
-    1: { label: 'Mainly clear', icon: 'sun' },
-    2: { label: 'Partly cloudy', icon: 'cloud-sun' },
-    3: { label: 'Overcast', icon: 'cloud' },
-    45: { label: 'Fog', icon: 'fog' },
-    48: { label: 'Rime fog', icon: 'fog' },
-    51: { label: 'Light drizzle', icon: 'drizzle' },
-    53: { label: 'Drizzle', icon: 'drizzle' },
-    55: { label: 'Heavy drizzle', icon: 'drizzle' },
-    56: { label: 'Freezing drizzle', icon: 'sleet' },
-    57: { label: 'Heavy freezing drizzle', icon: 'sleet' },
-    61: { label: 'Light rain', icon: 'rain' },
-    63: { label: 'Rain', icon: 'rain' },
-    65: { label: 'Heavy rain', icon: 'rain' },
-    66: { label: 'Freezing rain', icon: 'sleet' },
-    67: { label: 'Heavy freezing rain', icon: 'sleet' },
-    71: { label: 'Light snow', icon: 'snow' },
-    73: { label: 'Snow', icon: 'snow' },
-    75: { label: 'Heavy snow', icon: 'snow' },
-    77: { label: 'Snow grains', icon: 'snow' },
-    80: { label: 'Light showers', icon: 'rain' },
-    81: { label: 'Showers', icon: 'rain' },
-    82: { label: 'Heavy showers', icon: 'rain' },
-    85: { label: 'Snow showers', icon: 'snow' },
-    86: { label: 'Heavy snow showers', icon: 'snow' },
-    95: { label: 'Thunderstorm', icon: 'storm' },
-    96: { label: 'Thunderstorm with hail', icon: 'storm' },
-    99: { label: 'Thunderstorm with hail', icon: 'storm' }
+    0: { label: 'Clear sky', icon: 'sun' }, 1: { label: 'Mainly clear', icon: 'sun' },
+    2: { label: 'Partly cloudy', icon: 'cloud-sun' }, 3: { label: 'Overcast', icon: 'cloud' },
+    45: { label: 'Fog', icon: 'fog' }, 48: { label: 'Rime fog', icon: 'fog' },
+    51: { label: 'Light drizzle', icon: 'drizzle' }, 53: { label: 'Drizzle', icon: 'drizzle' }, 55: { label: 'Heavy drizzle', icon: 'drizzle' },
+    56: { label: 'Freezing drizzle', icon: 'sleet' }, 57: { label: 'Heavy freezing drizzle', icon: 'sleet' },
+    61: { label: 'Light rain', icon: 'rain' }, 63: { label: 'Rain', icon: 'rain' }, 65: { label: 'Heavy rain', icon: 'rain' },
+    66: { label: 'Freezing rain', icon: 'sleet' }, 67: { label: 'Heavy freezing rain', icon: 'sleet' },
+    71: { label: 'Light snow', icon: 'snow' }, 73: { label: 'Snow', icon: 'snow' }, 75: { label: 'Heavy snow', icon: 'snow' }, 77: { label: 'Snow grains', icon: 'snow' },
+    80: { label: 'Light showers', icon: 'rain' }, 81: { label: 'Showers', icon: 'rain' }, 82: { label: 'Heavy showers', icon: 'rain' },
+    85: { label: 'Snow showers', icon: 'snow' }, 86: { label: 'Heavy snow showers', icon: 'snow' },
+    95: { label: 'Thunderstorm', icon: 'storm' }, 96: { label: 'Thunderstorm with hail', icon: 'storm' }, 99: { label: 'Thunderstorm with hail', icon: 'storm' }
   };
 
   const ICONS = {
@@ -53,228 +33,245 @@
     fog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14a4 4 0 0 1-.7-7.94A5.5 5.5 0 0 1 17.1 4.5 3.75 3.75 0 0 1 17.25 12H7Z" fill="rgba(234,242,255,0.18)"/><path d="M4 16h16M6 19h12" stroke="#b8cade"/></svg>'
   };
 
+  const $ = (id) => document.getElementById(id);
   const el = {
-    searchForm: document.getElementById('search-form'),
-    searchInput: document.getElementById('search-input'),
-    locationBtn: document.getElementById('location-btn'),
-    status: document.getElementById('status'),
-    locationName: document.getElementById('location-name'),
-    locationMeta: document.getElementById('location-meta'),
-    currentTemp: document.getElementById('current-temp'),
-    currentCondition: document.getElementById('current-condition'),
-    feelsLike: document.getElementById('feels-like'),
-    currentIcon: document.getElementById('current-icon'),
-    updatedAt: document.getElementById('updated-at'),
-    humidity: document.getElementById('stat-humidity'),
-    wind: document.getElementById('stat-wind'),
-    precip: document.getElementById('stat-precip'),
-    uv: document.getElementById('stat-uv'),
-    visibility: document.getElementById('stat-visibility'),
-    pressure: document.getElementById('stat-pressure'),
-    hourly: document.getElementById('hourly-scroll'),
-    daily: document.getElementById('daily-list'),
-    radarPlay: document.getElementById('radar-play'),
-    radarTime: document.getElementById('radar-time')
+    searchForm: $('search-form'), searchInput: $('search-input'), locationBtn: $('location-btn'), unitBtn: $('unit-btn'),
+    saveLocationBtn: $('save-location-btn'), clearSavedBtn: $('clear-saved-btn'), status: $('status'),
+    locationName: $('location-name'), locationMeta: $('location-meta'), currentTemp: $('current-temp'),
+    currentCondition: $('current-condition'), feelsLike: $('feels-like'), hiLo: $('hi-lo'), currentIcon: $('current-icon'),
+    updatedAt: $('updated-at'), humidity: $('stat-humidity'), wind: $('stat-wind'), gust: $('stat-gust'),
+    precip: $('stat-precip'), uv: $('stat-uv'), cloud: $('stat-cloud'), visibility: $('stat-visibility'),
+    pressure: $('stat-pressure'), dew: $('stat-dew'), hourly: $('hourly-scroll'), daily: $('daily-list'),
+    radarPlay: $('radar-play'), radarTime: $('radar-time'), radarRange: $('radar-range'),
+    insights: $('insights-grid'), sunrise: $('sunrise'), sunset: $('sunset'), daylight: $('daylight'),
+    moonPhase: $('moon-phase'), sunProgress: $('sun-progress'), sunDot: $('sun-dot'), sunriseLabel: $('sunrise-label'),
+    sunsetLabel: $('sunset-label'), aqiBadge: $('aqi-badge'), aqiScore: $('aqi-score'), aqiLabel: $('aqi-label'),
+    aqiPm25: $('aqi-pm25'), aqiPm10: $('aqi-pm10'), aqiO3: $('aqi-o3'), aqiUv: $('aqi-uv'), aqiAdvice: $('aqi-advice'),
+    savedList: $('saved-list')
   };
 
   const state = {
-    location: { ...DEFAULT_LOCATION },
-    map: null,
-    marker: null,
-    baseLayer: null,
-    radarFrames: [],
-    radarLayers: [],
-    radarIndex: 0,
-    radarTimer: null,
-    radarHost: 'https://tilecache.rainviewer.com'
+    location: { ...DEFAULT_LOCATION }, weather: null, aqi: null,
+    unit: localStorage.getItem(STORAGE_KEYS.unit) === 'c' ? 'c' : 'f',
+    saved: loadSaved(),
+    map: null, marker: null, radarFrames: [], radarLayers: [], radarIndex: 0, radarTimer: null, radarHost: 'https://tilecache.rainviewer.com'
   };
 
-  function iconFor(code) {
-    const key = (WMO[code] || WMO[0]).icon;
-    return ICONS[key] || ICONS.cloud;
+  function loadSaved() {
+    try { const v = JSON.parse(localStorage.getItem(STORAGE_KEYS.saved) || '[]'); return Array.isArray(v) ? v.slice(0, 8) : []; }
+    catch (_) { return []; }
   }
+  function persistSaved() { localStorage.setItem(STORAGE_KEYS.saved, JSON.stringify(state.saved.slice(0, 8))); }
+  function persistUnit() { localStorage.setItem(STORAGE_KEYS.unit, state.unit); }
 
-  function labelFor(code) {
-    return (WMO[code] || { label: 'Unknown' }).label;
+  const iconFor = (code) => ICONS[(WMO[code] || WMO[0]).icon] || ICONS.cloud;
+  const labelFor = (code) => (WMO[code] || { label: 'Unknown' }).label;
+  const escapeHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  const toC = (f) => (f - 32) * 5 / 9;
+  const tempValue = (f) => state.unit === 'c' ? toC(f) : f;
+  const fmtTemp = (f, decimals = 0) => { const v = tempValue(f); return (decimals ? v.toFixed(decimals) : Math.round(v)) + '°'; };
+  const fmtSpeed = (mph) => state.unit === 'c' ? Math.round(mph * 1.60934) + ' km/h' : Math.round(mph) + ' mph';
+  const fmtVis = (mi) => state.unit === 'c' ? (mi * 1.60934).toFixed(1) + ' km' : mi.toFixed(1) + ' mi';
+  const fmtPressure = (hPa) => state.unit === 'c' ? Math.round(hPa) + ' hPa' : (hPa * 0.02953).toFixed(2) + ' inHg';
+  function setStatus(msg, type) { el.status.textContent = msg || ''; el.status.className = 'status' + (type ? ' ' + type : ''); }
+
+  function formatHour(iso, tz) { return new Intl.DateTimeFormat(undefined, { hour: 'numeric', timeZone: tz }).format(new Date(iso)); }
+  function formatDay(iso, tz, i) { if (i === 0) return 'Today'; return new Intl.DateTimeFormat(undefined, { weekday: 'short', timeZone: tz }).format(new Date(iso + 'T00:00:00')); }
+  function formatTime(iso, tz) { return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZone: tz }).format(new Date(iso)); }
+  function formatUpdated(iso, tz) { try { return 'Updated ' + formatTime(iso, tz); } catch (_) { return 'Updated just now'; } }
+
+  function uvLabel(uv) { if (uv < 3) return 'Low'; if (uv < 6) return 'Moderate'; if (uv < 8) return 'High'; if (uv < 11) return 'Very high'; return 'Extreme'; }
+  function uvColor(uv) { if (uv < 3) return '#57d38c'; if (uv < 6) return '#ffd36a'; if (uv < 8) return '#ff9f43'; if (uv < 11) return '#ff6b6b'; return '#b084ff'; }
+  function aqiInfo(aqi) {
+    if (aqi == null) return { label: 'Unavailable', color: '#94a9c3', advice: 'Air quality data is unavailable for this location right now.' };
+    if (aqi <= 50) return { label: 'Good', color: '#57d38c', advice: 'Air quality is good. Great time for outdoor activities.' };
+    if (aqi <= 100) return { label: 'Moderate', color: '#ffd36a', advice: 'Air quality is acceptable. Sensitive groups should limit prolonged outdoor exertion.' };
+    if (aqi <= 150) return { label: 'Sensitive', color: '#ff9f43', advice: 'Sensitive groups may experience effects. Consider reducing intense outdoor activity.' };
+    if (aqi <= 200) return { label: 'Unhealthy', color: '#ff6b6b', advice: 'Everyone may begin to feel effects. Limit prolonged outdoor exposure.' };
+    if (aqi <= 300) return { label: 'Very Unhealthy', color: '#c45cff', advice: 'Health alert: avoid prolonged outdoor exertion when possible.' };
+    return { label: 'Hazardous', color: '#8b3a3a', advice: 'Emergency conditions. Stay indoors and reduce exposure.' };
   }
-
-  function setStatus(message, type) {
-    el.status.textContent = message || '';
-    el.status.className = 'status' + (type ? ' ' + type : '');
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  function formatTemp(v) {
-    return Math.round(v) + '°';
-  }
-
-  function formatHour(iso, tz) {
-    const d = new Date(iso);
-    return new Intl.DateTimeFormat(undefined, { hour: 'numeric', timeZone: tz }).format(d);
-  }
-
-  function formatDay(iso, tz, index) {
-    const d = new Date(iso + 'T00:00:00');
-    if (index === 0) return 'Today';
-    return new Intl.DateTimeFormat(undefined, { weekday: 'short', timeZone: tz }).format(d);
-  }
-
-  function formatUpdated(iso, tz) {
-    try {
-      const d = new Date(iso);
-      return 'Updated ' + new Intl.DateTimeFormat(undefined, {
-        hour: 'numeric', minute: '2-digit', timeZone: tz
-      }).format(d);
-    } catch (_) {
-      return 'Updated just now';
-    }
-  }
-
-  function uvLabel(uv) {
-    if (uv < 3) return 'Low';
-    if (uv < 6) return 'Moderate';
-    if (uv < 8) return 'High';
-    if (uv < 11) return 'Very high';
-    return 'Extreme';
+  function degToCompass(deg) { const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW']; return dirs[Math.round(((deg % 360) / 22.5)) % 16]; }
+  function moonPhase(date) {
+    const synodic = 29.53058867;
+    const known = Date.UTC(2000, 0, 6, 18, 14); // known new moon
+    const days = (Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) - known) / 86400000;
+    const phase = ((days % synodic) + synodic) % synodic;
+    const pct = phase / synodic;
+    const names = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+    const idx = Math.floor((pct * 8) + 0.5) % 8;
+    const illum = Math.round((1 - Math.abs((phase / synodic) * 2 - 1)) * 100);
+    return { name: names[idx], illum };
   }
 
   async function fetchJson(url) {
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error('Request failed: ' + res.status);
     return res.json();
   }
 
   async function searchLocation(query) {
-    const url = 'https://geocoding-api.open-meteo.com/v1/search?name=' +
-      encodeURIComponent(query) + '&count=1&language=en&format=json';
+    const url = 'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(query) + '&count=1&language=en&format=json';
     const data = await fetchJson(url);
     if (!data.results || !data.results.length) throw new Error('No location found for "' + query + '".');
     const r = data.results[0];
-    return {
-      name: r.name,
-      admin1: r.admin1 || '',
-      country: r.country || '',
-      latitude: r.latitude,
-      longitude: r.longitude,
-      timezone: r.timezone || 'auto'
-    };
+    return { name: r.name, admin1: r.admin1 || '', country: r.country || '', latitude: r.latitude, longitude: r.longitude, timezone: r.timezone || 'auto' };
   }
 
   async function reverseGeocode(lat, lon) {
-    // Open-Meteo has no reverse geocoding; use BigDataCloud free client endpoint.
     try {
-      const url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' +
-        lat + '&longitude=' + lon + '&localityLanguage=en';
+      const url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=en';
       const d = await fetchJson(url);
       return {
         name: d.city || d.locality || d.principalSubdivision || 'Current location',
-        admin1: d.principalSubdivision || '',
-        country: d.countryName || '',
-        latitude: lat,
-        longitude: lon,
-        timezone: d.localityInfo?.informative?.find(x => /time/i.test(x.name || ''))?.name || Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto'
+        admin1: d.principalSubdivision || '', country: d.countryName || '',
+        latitude: lat, longitude: lon, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto'
       };
     } catch (_) {
-      return {
-        name: 'Current location',
-        admin1: '',
-        country: '',
-        latitude: lat,
-        longitude: lon,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto'
-      };
+      return { name: 'Current location', admin1: '', country: '', latitude: lat, longitude: lon, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto' };
     }
   }
 
   async function fetchWeather(loc) {
     const params = new URLSearchParams({
-      latitude: loc.latitude,
-      longitude: loc.longitude,
-      current: 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl,visibility,is_day',
+      latitude: loc.latitude, longitude: loc.longitude,
+      current: 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,visibility,cloud_cover,dew_point_2m,is_day',
       hourly: 'temperature_2m,precipitation_probability,weather_code,is_day',
       daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset',
-      temperature_unit: 'fahrenheit',
-      wind_speed_unit: 'mph',
-      precipitation_unit: 'inch',
-      timezone: loc.timezone || 'auto',
-      forecast_days: 7
+      temperature_unit: 'fahrenheit', wind_speed_unit: 'mph', precipitation_unit: 'inch',
+      timezone: loc.timezone || 'auto', forecast_days: 7
     });
     return fetchJson('https://api.open-meteo.com/v1/forecast?' + params.toString());
   }
 
-  function renderCurrent(loc, data) {
-    const c = data.current;
-    const daily = data.daily;
-    const tz = data.timezone || loc.timezone;
+  async function fetchAQI(loc) {
+    const params = new URLSearchParams({
+      latitude: loc.latitude, longitude: loc.longitude,
+      current: 'us_aqi,pm2_5,pm10,ozone,uv_index',
+      timezone: loc.timezone || 'auto'
+    });
+    try { return await fetchJson('https://air-quality-api.open-meteo.com/v1/air-quality?' + params.toString()); }
+    catch (_) { return null; }
+  }
+
+  function renderCurrent(loc, data, aqiData) {
+    const c = data.current; const daily = data.daily; const tz = data.timezone || loc.timezone;
     el.locationName.textContent = loc.name;
     el.locationMeta.textContent = [loc.admin1, loc.country].filter(Boolean).join(', ') || '—';
-    el.currentTemp.textContent = formatTemp(c.temperature_2m);
+    el.currentTemp.textContent = fmtTemp(c.temperature_2m);
     el.currentCondition.textContent = labelFor(c.weather_code);
-    el.feelsLike.textContent = 'Feels like ' + formatTemp(c.apparent_temperature);
+    el.feelsLike.textContent = 'Feels like ' + fmtTemp(c.apparent_temperature);
+    el.hiLo.textContent = 'H: ' + fmtTemp(daily.temperature_2m_max[0]) + '  L: ' + fmtTemp(daily.temperature_2m_min[0]);
     el.currentIcon.innerHTML = iconFor(c.weather_code);
     el.updatedAt.textContent = formatUpdated(c.time, tz);
     el.humidity.textContent = Math.round(c.relative_humidity_2m) + '%';
-    const windDir = degToCompass(c.wind_direction_10m);
-    el.wind.textContent = Math.round(c.wind_speed_10m) + ' mph ' + windDir;
+    el.wind.textContent = fmtSpeed(c.wind_speed_10m) + ' ' + degToCompass(c.wind_direction_10m);
+    el.gust.textContent = c.wind_gusts_10m != null ? fmtSpeed(c.wind_gusts_10m) : '--';
     el.precip.textContent = (c.precipitation || 0).toFixed(2) + ' in';
     const uv = daily.uv_index_max ? daily.uv_index_max[0] : null;
     el.uv.textContent = uv != null ? Math.round(uv) + ' ' + uvLabel(uv) : '--';
-    const visMi = c.visibility != null ? (c.visibility / 1609.344) : null;
-    el.visibility.textContent = visMi != null ? visMi.toFixed(1) + ' mi' : '--';
-    el.pressure.textContent = c.pressure_msl != null ? Math.round(c.pressure_msl) + ' hPa' : '--';
+    el.uv.style.color = uv != null ? uvColor(uv) : '';
+    el.cloud.textContent = c.cloud_cover != null ? Math.round(c.cloud_cover) + '%' : '--';
+    el.visibility.textContent = c.visibility != null ? fmtVis(c.visibility / 1609.344) : '--';
+    el.pressure.textContent = c.pressure_msl != null ? fmtPressure(c.pressure_msl) : '--';
+    el.dew.textContent = c.dew_point_2m != null ? fmtTemp(c.dew_point_2m) : '--';
+    renderAstronomy(daily, tz);
+    renderAQI(aqiData, uv);
+    renderInsights(c, daily, aqiData, tz);
   }
 
-  function degToCompass(deg) {
-    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-    return dirs[Math.round(((deg % 360) / 22.5)) % 16];
+  function renderAstronomy(daily, tz) {
+    const sr = daily.sunrise[0]; const ss = daily.sunset[0];
+    el.sunrise.textContent = sr ? formatTime(sr, tz) : '--';
+    el.sunset.textContent = ss ? formatTime(ss, tz) : '--';
+    el.sunriseLabel.textContent = sr ? formatTime(sr, tz) : '--';
+    el.sunsetLabel.textContent = ss ? formatTime(ss, tz) : '--';
+    if (sr && ss) {
+      const srMs = new Date(sr).getTime(); const ssMs = new Date(ss).getTime();
+      const daylightMs = Math.max(0, ssMs - srMs);
+      const h = Math.floor(daylightMs / 3600000); const m = Math.round((daylightMs % 3600000) / 60000);
+      el.daylight.textContent = h + 'h ' + m + 'm';
+      const now = Date.now();
+      const pct = Math.min(100, Math.max(0, ((now - srMs) / (ssMs - srMs)) * 100));
+      el.sunProgress.style.width = pct + '%';
+      el.sunDot.style.left = pct + '%';
+      el.sunDot.style.opacity = (now < srMs || now > ssMs) ? '0.35' : '1';
+    } else {
+      el.daylight.textContent = '--'; el.sunProgress.style.width = '0%'; el.sunDot.style.left = '0%';
+    }
+    const moon = moonPhase(new Date());
+    el.moonPhase.textContent = moon.name + ' (' + moon.illum + '%)';
+  }
+
+  function renderAQI(aqiData, uvFromDaily) {
+    const c = aqiData && aqiData.current ? aqiData.current : null;
+    const aqi = c && c.us_aqi != null ? Math.round(c.us_aqi) : null;
+    const info = aqiInfo(aqi);
+    el.aqiScore.textContent = aqi != null ? aqi : '--';
+    el.aqiScore.style.color = info.color;
+    el.aqiLabel.textContent = info.label;
+    el.aqiBadge.textContent = info.label;
+    el.aqiBadge.style.background = info.color + '22';
+    el.aqiBadge.style.color = info.color;
+    el.aqiPm25.textContent = c && c.pm2_5 != null ? c.pm2_5.toFixed(1) + ' µg/m³' : '--';
+    el.aqiPm10.textContent = c && c.pm10 != null ? c.pm10.toFixed(1) + ' µg/m³' : '--';
+    el.aqiO3.textContent = c && c.ozone != null ? Math.round(c.ozone) + ' µg/m³' : '--';
+    el.aqiUv.textContent = c && c.uv_index != null ? c.uv_index.toFixed(1) : (uvFromDaily != null ? uvFromDaily.toFixed(1) : '--');
+    el.aqiAdvice.textContent = info.advice;
+  }
+
+  function renderInsights(current, daily, aqiData, tz) {
+    const uv = daily.uv_index_max[0] || 0;
+    const pop = daily.precipitation_probability_max[0] || 0;
+    const gust = current.wind_gusts_10m || 0;
+    const code = current.weather_code;
+    const aqi = aqiData && aqiData.current && aqiData.current.us_aqi != null ? aqiData.current.us_aqi : null;
+    const isRain = [61,63,65,66,67,80,81,82,95,96,99].includes(code) || pop >= 50;
+
+    const cards = [];
+    if (isRain || pop >= 35) cards.push({ icon: '☔', title: 'Umbrella', body: pop >= 60 ? 'High chance of rain (' + pop + '%). Bring an umbrella.' : 'Some rain possible (' + pop + '%). Keep a layer or umbrella handy.' });
+    else cards.push({ icon: '🌤️', title: 'Umbrella', body: 'Rain is unlikely today (' + pop + '% chance). You can likely leave the umbrella.' });
+
+    if (uv >= 6) cards.push({ icon: '🧴', title: 'Sun Protection', body: 'UV index is ' + Math.round(uv) + ' (' + uvLabel(uv) + '). Sunscreen and shade are recommended.' });
+    else if (uv >= 3) cards.push({ icon: '🕶️', title: 'Sun Protection', body: 'Moderate UV (' + Math.round(uv) + '). Sunglasses or sunscreen may help midday.' });
+    else cards.push({ icon: '☁️', title: 'Sun Protection', body: 'Low UV today (' + Math.round(uv) + '). Minimal sun protection needed.' });
+
+    if (gust >= 30) cards.push({ icon: '💨', title: 'Wind', body: 'Gusts up to ' + fmtSpeed(gust) + '. Secure loose items and expect breezy conditions.' });
+    else if (current.wind_speed_10m >= 15) cards.push({ icon: '🍃', title: 'Wind', body: 'A steady breeze around ' + fmtSpeed(current.wind_speed_10m) + '. Comfortable for most activities.' });
+    else cards.push({ icon: '🌿', title: 'Wind', body: 'Winds are calm around ' + fmtSpeed(current.wind_speed_10m) + '. Great for outdoor plans.' });
+
+    if (aqi != null && aqi > 100) cards.push({ icon: '😷', title: 'Air Quality', body: 'AQI is ' + Math.round(aqi) + ' (' + aqiInfo(aqi).label + '). Consider limiting strenuous outdoor activity.' });
+    else if (aqi != null) cards.push({ icon: '✅', title: 'Air Quality', body: 'AQI is ' + Math.round(aqi) + ' (' + aqiInfo(aqi).label + '). Outdoor air looks fine for most people.' });
+    else cards.push({ icon: '🌡️', title: 'Comfort', body: 'Feels like ' + fmtTemp(current.apparent_temperature) + ' with ' + Math.round(current.relative_humidity_2m) + '% humidity.' });
+
+    el.insights.innerHTML = cards.map(c => '<div class="insight-card"><div class="insight-title"><span>' + c.icon + '</span>' + escapeHtml(c.title) + '</div><div class="insight-body">' + escapeHtml(c.body) + '</div></div>').join('');
   }
 
   function renderHourly(data) {
-    const tz = data.timezone;
-    const now = Date.now();
-    const times = data.hourly.time;
+    const tz = data.timezone; const times = data.hourly.time; const now = Date.now();
     let start = 0;
-    for (let i = 0; i < times.length; i++) {
-      if (new Date(times[i]).getTime() >= now - 30 * 60 * 1000) { start = i; break; }
-    }
+    for (let i = 0; i < times.length; i++) { if (new Date(times[i]).getTime() >= now - 30 * 60 * 1000) { start = i; break; } }
     const end = Math.min(start + 24, times.length);
     let html = '';
     for (let i = start; i < end; i++) {
-      const t = times[i];
-      const temp = data.hourly.temperature_2m[i];
-      const code = data.hourly.weather_code[i];
-      const pop = data.hourly.precipitation_probability[i];
+      const t = times[i], temp = data.hourly.temperature_2m[i], code = data.hourly.weather_code[i], pop = data.hourly.precipitation_probability[i];
       const isNow = i === start;
       html += '<div class="hour-card' + (isNow ? ' now' : '') + '">' +
         '<div class="hour-time">' + (isNow ? 'Now' : escapeHtml(formatHour(t, tz))) + '</div>' +
         '<div class="hour-icon">' + iconFor(code) + '</div>' +
-        '<div class="hour-temp">' + formatTemp(temp) + '</div>' +
-        '<div class="hour-precip">' + (pop > 0 ? pop + '% precip' : '&nbsp;') + '</div>' +
-        '</div>';
+        '<div class="hour-temp">' + fmtTemp(temp) + '</div>' +
+        '<div class="hour-precip">' + (pop > 0 ? pop + '% rain' : '&nbsp;') + '</div></div>';
     }
     el.hourly.innerHTML = html;
   }
 
   function renderDaily(data) {
-    const tz = data.timezone;
-    const d = data.daily;
-    const mins = d.temperature_2m_min;
-    const maxs = d.temperature_2m_max;
-    const lo = Math.min.apply(null, mins);
-    const hi = Math.max.apply(null, maxs);
-    const span = Math.max(hi - lo, 1);
+    const tz = data.timezone; const d = data.daily;
+    const mins = d.temperature_2m_min, maxs = d.temperature_2m_max;
+    const lo = Math.min.apply(null, mins), hi = Math.max.apply(null, maxs), span = Math.max(hi - lo, 1);
     let html = '';
     for (let i = 0; i < d.time.length; i++) {
-      const min = mins[i];
-      const max = maxs[i];
+      const min = mins[i], max = maxs[i];
       const left = ((min - lo) / span) * 100;
       const width = Math.max(((max - min) / span) * 100, 6);
       const pop = d.precipitation_probability_max[i];
@@ -282,13 +279,12 @@
         '<div class="daily-day">' + escapeHtml(formatDay(d.time[i], tz, i)) + '</div>' +
         '<div class="daily-icon">' + iconFor(d.weather_code[i]) + '</div>' +
         '<div class="daily-bar-wrap">' +
-          '<span class="lo">' + Math.round(min) + '°</span>' +
+          '<span class="lo">' + Math.round(tempValue(min)) + '°</span>' +
           '<div class="daily-bar"><div class="daily-bar-fill" style="left:' + left.toFixed(2) + '%;width:' + width.toFixed(2) + '%"></div></div>' +
-          '<span class="hi">' + Math.round(max) + '°</span>' +
+          '<span class="hi">' + Math.round(tempValue(max)) + '°</span>' +
         '</div>' +
         '<div class="daily-precip">' + (pop > 0 ? pop + '%' : '—') + '</div>' +
-        '<div class="daily-desc">' + escapeHtml(labelFor(d.weather_code[i])) + '</div>' +
-        '</div>';
+        '<div class="daily-desc">' + escapeHtml(labelFor(d.weather_code[i])) + '</div></div>';
     }
     el.daily.innerHTML = html;
   }
@@ -296,13 +292,8 @@
   function initMap() {
     if (state.map) return;
     state.map = L.map('radar-map', { zoomControl: true, attributionControl: true }).setView([state.location.latitude, state.location.longitude], 8);
-    state.baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(state.map);
-    state.marker = L.circleMarker([state.location.latitude, state.location.longitude], {
-      radius: 7, color: '#ffffff', weight: 2, fillColor: '#2390ff', fillOpacity: 1
-    }).addTo(state.map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(state.map);
+    state.marker = L.circleMarker([state.location.latitude, state.location.longitude], { radius: 7, color: '#fff', weight: 2, fillColor: '#2390ff', fillOpacity: 1 }).addTo(state.map);
   }
 
   function updateMapLocation(loc) {
@@ -311,79 +302,87 @@
     state.marker.setLatLng([loc.latitude, loc.longitude]);
   }
 
-  function clearRadarLayers() {
-    state.radarLayers.forEach(l => { try { state.map.removeLayer(l); } catch (_) {} });
-    state.radarLayers = [];
-  }
-
-  function stopRadar() {
-    if (state.radarTimer) { clearInterval(state.radarTimer); state.radarTimer = null; }
-    el.radarPlay.textContent = 'Play';
-  }
+  function clearRadarLayers() { state.radarLayers.forEach(l => { try { state.map.removeLayer(l); } catch (_) {} }); state.radarLayers = []; }
+  function stopRadar() { if (state.radarTimer) { clearInterval(state.radarTimer); state.radarTimer = null; } el.radarPlay.textContent = 'Play'; }
 
   function showRadarFrame(index) {
     if (!state.radarFrames.length) return;
     state.radarIndex = (index + state.radarFrames.length) % state.radarFrames.length;
-    state.radarLayers.forEach((layer, i) => {
-      layer.setOpacity(i === state.radarIndex ? 0.75 : 0);
-    });
+    state.radarLayers.forEach((layer, i) => layer.setOpacity(i === state.radarIndex ? 0.75 : 0));
     const frame = state.radarFrames[state.radarIndex];
     const d = new Date(frame.time * 1000);
-    el.radarTime.textContent = new Intl.DateTimeFormat(undefined, {
-      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-    }).format(d);
+    const label = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(d);
+    el.radarTime.textContent = (frame.kind === 'nowcast' ? 'Forecast ' : '') + label;
+    el.radarRange.value = String(state.radarIndex);
   }
 
   async function loadRadar() {
-    initMap();
-    stopRadar();
+    initMap(); stopRadar();
     try {
       const data = await fetchJson('https://api.rainviewer.com/public/weather-maps.json');
-      const past = (data.radar && data.radar.past) ? data.radar.past.slice(-12) : [];
-      const nowcast = (data.radar && data.radar.nowcast) ? data.radar.nowcast : [];
+      const past = (data.radar && data.radar.past) ? data.radar.past.slice(-12).map(f => ({ ...f, kind: 'past' })) : [];
+      const nowcast = (data.radar && data.radar.nowcast) ? data.radar.nowcast.slice(0, 3).map(f => ({ ...f, kind: 'nowcast' })) : [];
       const frames = past.concat(nowcast);
       state.radarHost = data.host || state.radarHost;
       clearRadarLayers();
       state.radarFrames = frames;
-      if (!frames.length) {
-        el.radarTime.textContent = 'Radar unavailable';
-        return;
-      }
+      el.radarRange.max = String(Math.max(0, frames.length - 1));
+      if (!frames.length) { el.radarTime.textContent = 'Radar unavailable'; return; }
       frames.forEach((frame, i) => {
         const url = state.radarHost + frame.path + '/256/{z}/{x}/{y}/2/1_1.png';
         const layer = L.tileLayer(url, { opacity: i === frames.length - 1 ? 0.75 : 0, zIndex: 300 });
         layer.addTo(state.map);
         state.radarLayers.push(layer);
       });
-      showRadarFrame(frames.length - 1);
-    } catch (err) {
-      console.error(err);
-      el.radarTime.textContent = 'Radar failed to load';
-    }
+      showRadarFrame(Math.max(0, past.length - 1));
+    } catch (err) { console.error(err); el.radarTime.textContent = 'Radar failed to load'; }
   }
 
   function toggleRadarPlayback() {
     if (!state.radarFrames.length) return;
     if (state.radarTimer) { stopRadar(); return; }
     el.radarPlay.textContent = 'Pause';
-    state.radarTimer = setInterval(() => {
-      showRadarFrame(state.radarIndex + 1);
-    }, 700);
+    state.radarTimer = setInterval(() => showRadarFrame(state.radarIndex + 1), 700);
+  }
+
+  function sameLocation(a, b) { return a && b && Math.abs(a.latitude - b.latitude) < 0.01 && Math.abs(a.longitude - b.longitude) < 0.01; }
+
+  function renderSaved() {
+    if (!state.saved.length) {
+      el.savedList.innerHTML = '<div class="saved-empty">Save locations for quick access. Your saved places stay in this browser.</div>';
+      return;
+    }
+    el.savedList.innerHTML = state.saved.map((loc, idx) => {
+      const meta = [loc.admin1, loc.country].filter(Boolean).join(', ');
+      return '<div class="saved-item" role="button" tabindex="0" data-saved-idx="' + idx + '">' +
+        '<div><div class="saved-name">' + escapeHtml(loc.name) + '</div><div class="saved-meta">' + escapeHtml(meta || 'Saved location') + '</div></div>' +
+        '<button class="saved-remove" type="button" data-remove-idx="' + idx + '" aria-label="Remove saved location">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function saveCurrentLocation() {
+    const loc = state.location;
+    if (!loc) return;
+    if (state.saved.some(s => sameLocation(s, loc))) { setStatus('Location already saved.'); return; }
+    state.saved.unshift({ name: loc.name, admin1: loc.admin1, country: loc.country, latitude: loc.latitude, longitude: loc.longitude, timezone: loc.timezone });
+    state.saved = state.saved.slice(0, 8);
+    persistSaved(); renderSaved();
+    setStatus('Saved ' + loc.name + '.');
   }
 
   async function loadLocation(loc, label) {
     setStatus(label || 'Loading weather...', 'loading');
     try {
       state.location = loc;
-      const weather = await fetchWeather(loc);
-      // If timezone was auto, adopt resolved timezone for formatting
+      const [weather, aqi] = await Promise.all([fetchWeather(loc), fetchAQI(loc)]);
       if (!loc.timezone || loc.timezone === 'auto') loc.timezone = weather.timezone;
-      renderCurrent(loc, weather);
+      state.weather = weather; state.aqi = aqi;
+      renderCurrent(loc, weather, aqi);
       renderHourly(weather);
       renderDaily(weather);
       updateMapLocation(loc);
       setStatus('');
-      // Refresh radar only if not loaded or location moved significantly
       if (!state.radarFrames.length) loadRadar();
     } catch (err) {
       console.error(err);
@@ -400,26 +399,18 @@
       const loc = await searchLocation(q);
       await loadLocation(loc, 'Loading weather for ' + loc.name + '...');
       el.searchInput.blur();
-    } catch (err) {
-      console.error(err);
-      setStatus(err.message || 'Search failed.', 'error');
-    }
+    } catch (err) { console.error(err); setStatus(err.message || 'Search failed.', 'error'); }
   }
 
   function handleGeolocation() {
-    if (!navigator.geolocation) {
-      setStatus('Geolocation is not supported by your browser.', 'error');
-      return;
-    }
+    if (!navigator.geolocation) { setStatus('Geolocation is not supported by your browser.', 'error'); return; }
     el.locationBtn.disabled = true;
     setStatus('Getting your location...', 'loading');
     navigator.geolocation.getCurrentPosition(async (pos) => {
       try {
         const loc = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
         await loadLocation(loc, 'Loading weather for your location...');
-      } finally {
-        el.locationBtn.disabled = false;
-      }
+      } finally { el.locationBtn.disabled = false; }
     }, (err) => {
       console.warn(err);
       setStatus('Could not access your location. Please search for a city.', 'error');
@@ -427,22 +418,55 @@
     }, { timeout: 10000, maximumAge: 300000 });
   }
 
+  function toggleUnits() {
+    state.unit = state.unit === 'f' ? 'c' : 'f';
+    persistUnit();
+    el.unitBtn.textContent = state.unit === 'f' ? '°F' : '°C';
+    if (state.weather) {
+      renderCurrent(state.location, state.weather, state.aqi);
+      renderHourly(state.weather);
+      renderDaily(state.weather);
+    }
+  }
+
+  function onSavedClick(e) {
+    const removeBtn = e.target.closest('[data-remove-idx]');
+    if (removeBtn) {
+      const idx = Number(removeBtn.getAttribute('data-remove-idx'));
+      const removed = state.saved[idx];
+      state.saved.splice(idx, 1);
+      persistSaved(); renderSaved();
+      if (removed) setStatus('Removed ' + removed.name + '.');
+      return;
+    }
+    const item = e.target.closest('[data-saved-idx]');
+    if (!item) return;
+    const idx = Number(item.getAttribute('data-saved-idx'));
+    const loc = state.saved[idx];
+    if (loc) loadLocation({ ...loc }, 'Loading weather for ' + loc.name + '...');
+  }
+
   function bindEvents() {
     el.searchForm.addEventListener('submit', handleSearch);
     el.locationBtn.addEventListener('click', handleGeolocation);
     el.radarPlay.addEventListener('click', toggleRadarPlayback);
+    el.radarRange.addEventListener('input', (e) => { stopRadar(); showRadarFrame(Number(e.target.value)); });
+    el.unitBtn.addEventListener('click', toggleUnits);
+    el.saveLocationBtn.addEventListener('click', saveCurrentLocation);
+    el.clearSavedBtn.addEventListener('click', () => { state.saved = []; persistSaved(); renderSaved(); setStatus('Saved locations cleared.'); });
+    el.savedList.addEventListener('click', onSavedClick);
+    el.savedList.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSavedClick(e); });
   }
 
   async function init() {
+    el.unitBtn.textContent = state.unit === 'f' ? '°F' : '°C';
+    renderSaved();
     bindEvents();
     initMap();
     await loadLocation(DEFAULT_LOCATION, 'Loading weather...');
     loadRadar();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
