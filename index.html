@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SkyScope - a full-featured weather app with live radar, forecasts, air quality, astronomy, and smart insights.">
+  <meta name="description" content="SkyScope - an active weather dashboard with live radar, forecasts, air quality, astronomy, and location tools.">
   <meta name="theme-color" content="#07111f">
   <title>SkyScope Weather</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"/></svg>
         </div>
         <div>
-          <p class="eyebrow">Live Weather Intelligence</p>
+          <p class="eyebrow">Live Weather Dashboard</p>
           <h1>SkyScope</h1>
         </div>
       </div>
@@ -32,147 +32,190 @@
           <input id="search-input" type="search" placeholder="Search city or place..." autocomplete="off" spellcheck="false">
           <button type="submit" class="btn primary">Search</button>
         </form>
-        <button id="location-btn" class="btn ghost" type="button" title="Use current location">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/></svg>
-          <span>Locate</span>
-        </button>
+        <button id="location-btn" class="btn ghost" type="button" title="Use current location">Locate</button>
         <button id="unit-btn" class="btn ghost" type="button" title="Toggle units">°F</button>
+        <button id="theme-btn" class="btn ghost" type="button" title="Toggle theme">Light</button>
       </div>
     </header>
 
-    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#/dashboard" data-route="dashboard" class="nav-link active">Dashboard</a>
+      <a href="#/radar" data-route="radar" class="nav-link">Radar</a>
+      <a href="#/forecast" data-route="forecast" class="nav-link">Forecast</a>
+      <a href="#/locations" data-route="locations" class="nav-link">Locations</a>
+    </nav>
 
-    <main class="dashboard">
-      <section class="panel hero-panel">
-        <div class="hero-main">
-          <div class="hero-copy">
-            <div class="location-row">
-              <div>
-                <p id="location-name" class="location-name">Loading...</p>
-                <p id="location-meta" class="location-meta">—</p>
+    <div class="status-bar">
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <div class="status-meta">
+        <span id="refresh-indicator" class="refresh-indicator">Auto-refresh on</span>
+        <button id="refresh-btn" class="btn small ghost" type="button">Refresh</button>
+      </div>
+    </div>
+
+    <section id="page-dashboard" class="page active">
+      <main class="dashboard">
+        <section class="panel hero-panel">
+          <div class="hero-main">
+            <div class="hero-copy">
+              <div class="location-row">
+                <div>
+                  <p id="location-name" class="location-name">Loading...</p>
+                  <p id="location-meta" class="location-meta">—</p>
+                </div>
+                <button id="save-location-btn" class="btn small ghost" type="button">Save</button>
               </div>
-              <button id="save-location-btn" class="btn small ghost" type="button" title="Save location">Save</button>
-            </div>
-            <div class="temp-row">
-              <span id="current-temp" class="current-temp">--°</span>
-              <div class="temp-side">
-                <p id="current-condition" class="current-condition">—</p>
-                <p id="feels-like" class="feels-like">Feels like --°</p>
-                <p id="hi-lo" class="feels-like">H: --° L: --°</p>
+              <div class="temp-row">
+                <span id="current-temp" class="current-temp">--°</span>
+                <div class="temp-side">
+                  <p id="current-condition" class="current-condition">—</p>
+                  <p id="feels-like" class="feels-like">Feels like --°</p>
+                  <p id="hi-lo" class="feels-like">H: --° L: --°</p>
+                </div>
               </div>
             </div>
+            <div class="hero-icon-wrap">
+              <div id="current-icon" class="current-icon" aria-hidden="true"></div>
+              <p id="updated-at" class="updated-at">Updated --</p>
+            </div>
           </div>
-          <div class="hero-icon-wrap">
-            <div id="current-icon" class="current-icon" aria-hidden="true"></div>
-            <p id="updated-at" class="updated-at">Updated --</p>
+          <div class="stats-grid">
+            <div class="stat-card"><span class="stat-label">Humidity</span><span id="stat-humidity" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Wind</span><span id="stat-wind" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Gusts</span><span id="stat-gust" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Precipitation</span><span id="stat-precip" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">UV Index</span><span id="stat-uv" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Cloud Cover</span><span id="stat-cloud" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Visibility</span><span id="stat-visibility" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Pressure</span><span id="stat-pressure" class="stat-value">--</span></div>
+            <div class="stat-card"><span class="stat-label">Dew Point</span><span id="stat-dew" class="stat-value">--</span></div>
           </div>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card"><span class="stat-label">Humidity</span><span id="stat-humidity" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Wind</span><span id="stat-wind" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Gusts</span><span id="stat-gust" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Precipitation</span><span id="stat-precip" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">UV Index</span><span id="stat-uv" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Cloud Cover</span><span id="stat-cloud" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Visibility</span><span id="stat-visibility" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Pressure</span><span id="stat-pressure" class="stat-value">--</span></div>
-          <div class="stat-card"><span class="stat-label">Dew Point</span><span id="stat-dew" class="stat-value">--</span></div>
-        </div>
-      </section>
+        </section>
 
-      <section class="panel radar-panel">
-        <div class="panel-head">
-          <div>
-            <p class="eyebrow">Live Radar</p>
-            <h2>Precipitation Map</h2>
+        <section class="panel radar-panel">
+          <div class="panel-head">
+            <div><p class="eyebrow">Live Radar</p><h2>Precipitation Map</h2></div>
+            <div class="radar-controls">
+              <button id="radar-play" class="btn small" type="button">Play</button>
+              <span id="radar-time" class="radar-time">Loading radar...</span>
+            </div>
           </div>
-          <div class="radar-controls">
-            <button id="radar-play" class="btn small" type="button" aria-label="Play radar animation">Play</button>
-            <span id="radar-time" class="radar-time">Loading radar...</span>
+          <div id="radar-map" class="radar-map" aria-label="Weather radar map"></div>
+          <div class="radar-footer">
+            <div class="radar-legend"><span>Light</span><div class="legend-bar"></div><span>Heavy</span></div>
+            <div class="radar-scrub"><input id="radar-range" type="range" min="0" max="0" value="0" step="1" aria-label="Radar timeline"></div>
+            <p class="attribution">Radar © <a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener noreferrer">RainViewer</a></p>
           </div>
-        </div>
-        <div id="radar-map" class="radar-map" aria-label="Weather radar map"></div>
-        <div class="radar-footer">
-          <div class="radar-legend"><span>Light</span><div class="legend-bar"></div><span>Heavy</span></div>
-          <div class="radar-scrub">
-            <label class="sr-only" for="radar-range">Radar timeline</label>
-            <input id="radar-range" type="range" min="0" max="0" value="0" step="1">
+        </section>
+
+        <section class="panel insights-panel">
+          <div class="panel-head"><div><p class="eyebrow">Smart Insights</p><h2>What to Expect</h2></div></div>
+          <div id="insights-grid" class="insights-grid"></div>
+        </section>
+
+        <section class="panel sun-panel">
+          <div class="panel-head"><div><p class="eyebrow">Sun & Moon</p><h2>Astronomy</h2></div></div>
+          <div class="astro-grid">
+            <div class="astro-card"><span class="stat-label">Sunrise</span><span id="sunrise" class="stat-value">--</span></div>
+            <div class="astro-card"><span class="stat-label">Sunset</span><span id="sunset" class="stat-value">--</span></div>
+            <div class="astro-card"><span class="stat-label">Daylight</span><span id="daylight" class="stat-value">--</span></div>
+            <div class="astro-card"><span class="stat-label">Moon Phase</span><span id="moon-phase" class="stat-value">--</span></div>
           </div>
-          <p class="attribution">Radar © <a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener noreferrer">RainViewer</a> · Map © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a></p>
-        </div>
-      </section>
-
-      <section class="panel insights-panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">Smart Insights</p><h2>What to Expect</h2></div>
-        </div>
-        <div id="insights-grid" class="insights-grid"></div>
-      </section>
-
-      <section class="panel sun-panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">Sun & Moon</p><h2>Astronomy</h2></div>
-        </div>
-        <div class="astro-grid">
-          <div class="astro-card"><span class="stat-label">Sunrise</span><span id="sunrise" class="stat-value">--</span></div>
-          <div class="astro-card"><span class="stat-label">Sunset</span><span id="sunset" class="stat-value">--</span></div>
-          <div class="astro-card"><span class="stat-label">Daylight</span><span id="daylight" class="stat-value">--</span></div>
-          <div class="astro-card"><span class="stat-label">Moon Phase</span><span id="moon-phase" class="stat-value">--</span></div>
-        </div>
-        <div class="sun-track-wrap">
-          <div class="sun-track"><div id="sun-progress" class="sun-progress"></div><div id="sun-dot" class="sun-dot"></div></div>
-          <div class="sun-track-labels"><span id="sunrise-label">--</span><span id="sunset-label">--</span></div>
-        </div>
-      </section>
-
-      <section class="panel aqi-panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">Air Quality</p><h2>AQI & Pollutants</h2></div>
-          <div id="aqi-badge" class="aqi-badge">--</div>
-        </div>
-        <div class="aqi-main">
-          <div class="aqi-score-wrap">
-            <div id="aqi-score" class="aqi-score">--</div>
-            <div id="aqi-label" class="aqi-label">Loading</div>
+          <div class="sun-track-wrap">
+            <div class="sun-track"><div id="sun-progress" class="sun-progress"></div><div id="sun-dot" class="sun-dot"></div></div>
+            <div class="sun-track-labels"><span id="sunrise-label">--</span><span id="sunset-label">--</span></div>
           </div>
-          <div class="aqi-details">
-            <div class="aqi-detail"><span>PM2.5</span><strong id="aqi-pm25">--</strong></div>
-            <div class="aqi-detail"><span>PM10</span><strong id="aqi-pm10">--</strong></div>
-            <div class="aqi-detail"><span>Ozone</span><strong id="aqi-o3">--</strong></div>
-            <div class="aqi-detail"><span>UV</span><strong id="aqi-uv">--</strong></div>
+        </section>
+
+        <section class="panel aqi-panel">
+          <div class="panel-head"><div><p class="eyebrow">Air Quality</p><h2>AQI & Pollutants</h2></div><div id="aqi-badge" class="aqi-badge">--</div></div>
+          <div class="aqi-main">
+            <div class="aqi-score-wrap"><div id="aqi-score" class="aqi-score">--</div><div id="aqi-label" class="aqi-label">Loading</div></div>
+            <div class="aqi-details">
+              <div class="aqi-detail"><span>PM2.5</span><strong id="aqi-pm25">--</strong></div>
+              <div class="aqi-detail"><span>PM10</span><strong id="aqi-pm10">--</strong></div>
+              <div class="aqi-detail"><span>Ozone</span><strong id="aqi-o3">--</strong></div>
+              <div class="aqi-detail"><span>UV</span><strong id="aqi-uv">--</strong></div>
+            </div>
           </div>
-        </div>
-        <p id="aqi-advice" class="aqi-advice">Air quality data will appear here.</p>
-      </section>
+          <p id="aqi-advice" class="aqi-advice">Air quality data will appear here.</p>
+        </section>
 
-      <section class="panel hourly-panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">Next 24 Hours</p><h2>Hourly Forecast</h2></div>
-        </div>
-        <div id="hourly-scroll" class="hourly-scroll" aria-label="Hourly forecast"></div>
-      </section>
+        <section class="panel hourly-panel">
+          <div class="panel-head"><div><p class="eyebrow">Next 24 Hours</p><h2>Hourly Forecast</h2></div></div>
+          <div id="hourly-scroll" class="hourly-scroll" aria-label="Hourly forecast"></div>
+        </section>
 
-      <section class="panel daily-panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">7-Day Outlook</p><h2>Daily Forecast</h2></div>
-        </div>
-        <div id="daily-list" class="daily-list" aria-label="Daily forecast"></div>
-      </section>
+        <section class="panel daily-panel">
+          <div class="panel-head"><div><p class="eyebrow">7-Day Outlook</p><h2>Daily Forecast</h2></div></div>
+          <div id="daily-list" class="daily-list" aria-label="Daily forecast"></div>
+        </section>
+      </main>
+    </section>
 
-      <section class="panel saved-panel">
-        <div class="panel-head">
-          <div><p class="eyebrow">Quick Access</p><h2>Saved Locations</h2></div>
-          <button id="clear-saved-btn" class="btn small ghost" type="button">Clear</button>
-        </div>
-        <div id="saved-list" class="saved-list"></div>
-      </section>
-    </main>
+    <section id="page-radar" class="page">
+      <div class="page-grid">
+        <section class="panel radar-panel radar-page-panel">
+          <div class="panel-head">
+            <div><p class="eyebrow">Radar Focus</p><h2>Live Precipitation Radar</h2></div>
+            <div class="radar-controls">
+              <button id="radar-play-2" class="btn small" type="button">Play</button>
+              <span id="radar-time-2" class="radar-time">Loading radar...</span>
+            </div>
+          </div>
+          <div id="radar-map-2" class="radar-map radar-map-large" aria-label="Large weather radar map"></div>
+          <div class="radar-footer">
+            <div class="radar-legend"><span>Light</span><div class="legend-bar"></div><span>Heavy</span></div>
+            <div class="radar-scrub"><input id="radar-range-2" type="range" min="0" max="0" value="0" step="1" aria-label="Radar timeline"></div>
+            <p class="attribution">Radar © RainViewer · Map © OSM</p>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Radar Details</p><h2>How to read this map</h2></div></div>
+          <div class="info-list">
+            <div class="info-item"><strong>Blue/green</strong><span>Light precipitation or drizzle.</span></div>
+            <div class="info-item"><strong>Yellow/orange</strong><span>Moderate rain and heavier showers.</span></div>
+            <div class="info-item"><strong>Red/purple</strong><span>Intense rainfall or storm cores.</span></div>
+            <div class="info-item"><strong>Timeline</strong><span>Scrub through recent frames and short nowcast frames.</span></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="page-forecast" class="page">
+      <div class="page-grid">
+        <section class="panel hourly-panel">
+          <div class="panel-head"><div><p class="eyebrow">Hourly</p><h2>24-Hour Detail</h2></div></div>
+          <div id="hourly-scroll-2" class="hourly-scroll"></div>
+        </section>
+        <section class="panel daily-panel">
+          <div class="panel-head"><div><p class="eyebrow">Daily</p><h2>7-Day Detail</h2></div></div>
+          <div id="daily-list-2" class="daily-list"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Conditions</p><h2>Today at a glance</h2></div></div>
+          <div id="forecast-details" class="details-grid"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="page-locations" class="page">
+      <div class="page-grid">
+        <section class="panel saved-panel">
+          <div class="panel-head"><div><p class="eyebrow">Quick Access</p><h2>Saved Locations</h2></div><button id="clear-saved-btn" class="btn small ghost" type="button">Clear</button></div>
+          <div id="saved-list" class="saved-list"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Active Location</p><h2>Current Selection</h2></div></div>
+          <div id="active-location-card" class="active-location-card"></div>
+        </section>
+      </div>
+    </section>
 
     <footer class="footer">
-      <p>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Radar by <a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener noreferrer">RainViewer</a>. Built for GitHub Pages.</p>
+      <p>Data: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · Radar: <a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener noreferrer">RainViewer</a> · Maps: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a></p>
     </footer>
   </div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="./assets/app.js"></script>
 </body>
